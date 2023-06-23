@@ -18,17 +18,6 @@ router.get("/download", (req, res) => {
   res.download(path.resolve(__dirname) + "/about.html");
 });
 
-router.get("/products", (req, res) => {
-  res.json([
-    {
-      id: "1234",
-      name: "Chrome",
-    },
-    {
-      id: "124",
-      name: "FireFox",
-    },
-  ]);
-});
+
 
 module.exports = router;
