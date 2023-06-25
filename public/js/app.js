@@ -22,7 +22,6 @@ const App = () => {
     if (!form.name || !form.price) {
       return;
     }
-    fetchProducts();
 
     fetch("/api/product", {
       method: "POST",
