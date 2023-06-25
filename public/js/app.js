@@ -4,12 +4,16 @@ const App = () => {
   React.useEffect(() => {
     fetchProducts();
   }, []);
+
+  const updateForm = (event, field) => {
+    setForm({...form, [field]: event.target.value});
+  };
+
   function fetchProducts() {
     fetch("/api/product")
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
-        console.log(data);
       });
   }
 
@@ -18,6 +22,8 @@ const App = () => {
     if (!form.name || !form.price) {
       return;
     }
+    fetchProducts();
+
     fetch("/api/product", {
       method: "POST",
       headers: {
@@ -26,13 +32,21 @@ const App = () => {
       body: JSON.stringify(form),
     })
       .then((res) => res.json())
-      .then((data) => () => {
+      .then((data) => {
         fetchProducts();
+        setForm({name: "", price: ""});
       });
   };
 
-  const updateForm = (event, field) => {
-    setForm({...form, [field]: event.target.value});
+  const deleteProduct = (productId) => {
+    fetch(`/api/product/${productId}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        fetchProducts();
+        console.log(productId);
+      });
   };
 
   return (
@@ -65,33 +79,37 @@ const App = () => {
         </div>
       </div>
 
-      <ul className="list-group mt-5 ">
-        {products.map((item) => {
-          return (
-            <li
-              className="list-group-item d-flex justify-content-between align-items-center"
-              key={item.id}
-            >
-              <div>
-                <strong>{item.name} </strong>
-                Price: {item.price}
-              </div>
-              <button className="btn">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="25"
-                  height="25"
-                  fill="currentColor"
-                  className="bi bi-trash-fill"
-                  viewBox="0 0 16 16"
-                >
-                  <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                </svg>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      {products.length ? (
+        <ul className="list-group mt-5 ">
+          {products.map((item) => {
+            return (
+              <li
+                className="list-group-item d-flex justify-content-between align-items-center"
+                key={item.id}
+              >
+                <div>
+                  <strong>{item.name} </strong>
+                  Price: {item.price}
+                </div>
+                <button className="btn" onClick={() => deleteProduct(item.id)}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="25"
+                    height="25"
+                    fill="currentColor"
+                    className="bi bi-trash-fill"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                  </svg>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <h1 className="mt-5">No products</h1>
+      )}
     </>
   );
 };
